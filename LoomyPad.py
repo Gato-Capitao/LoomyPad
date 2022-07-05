@@ -14,81 +14,10 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+from scrapLegacy import webScrapLoomian
+from formulas import tp_energy, tp_health, tp_otherStats
 
 #funcoes
-def webScrapLoomian():
-    """Criar um data frame com as informações dos Loomians 
-    Como: Id, nome e base stats, ficam no site https://loomian-legacy.fandom.com/wiki/List_of_Loomians_by_base_stats
-    """
-    
-    def limpar(loomian):
-        """Limpa certos caracteres que ficavam entre o nome dos loomians
-        exemplo: Cosmiore\.xa0(Encarased)
-        
-        Parametros:
-            str - loomian: Nome do loomians que será limpo se preciso
-        """
-        nome = loomian.split("\xa0")
-        if len(nome) > 1:
-            loomian = nome[0]+" "+nome[1]
-        return loomian
-    
-    pagina = requests.get("https://loomian-legacy.fandom.com/wiki/List_of_Loomians_by_base_stats")
-    sopa = BeautifulSoup(pagina.content, "html.parser")
-    tabela = sopa.find(id="mw-content-text")
-
-    loomiansDados = []
-    primeira = False
-
-    for i in tabela.find_all("tr"):
-        dadosModelo = {"id":0, "nome":"", "hp":0, "energy":0, "atkM":0, "defM":0, "atkR":0, "defR":0, "speed":0}
-        tds = 0
-        
-        for a in i.find_all("td"):
-            if a.b != None:
-                numeracao = str(a.b)
-                for caracter in [">", "<", "b", "/"]:
-                    numeracao = numeracao.replace(caracter, "")
-                dadosModelo["id"] = numeracao
-            
-            elif a.find("a") != None:
-                if not primeira:
-                    dadosModelo["nome"] = a.find("a").get("title")
-                    primeira = True
-                else:
-                    primeira = False 
-            
-            elif a.get("style") != None:
-                stats = str(a)[44:-6]
-                if tds == 0:
-                    dadosModelo["hp"]= stats
-                elif tds == 1:
-                    dadosModelo["energy"]= stats
-                elif tds == 2:
-                    dadosModelo["atkM"]= stats
-                elif tds == 3:
-                    dadosModelo["defM"]= stats
-                elif tds == 4:
-                    dadosModelo["atkR"]= stats
-                elif tds ==5:
-                    dadosModelo["defR"]= stats
-                else:
-                    dadosModelo["speed"]= stats
-                tds +=1 
-        if dadosModelo["id"] != 0:
-            loomiansDados.append(dadosModelo)
-            
-    return pd.DataFrame({
-        "Id":[a["id"] for a in loomiansDados],
-        "Loomian":[limpar(a["nome"]) for a in loomiansDados],
-        "Health":[a["hp"] for a in loomiansDados],
-        "Energy":[a["energy"] for a in loomiansDados],
-        "Melee ATK":[a["atkM"] for a in loomiansDados],
-        "Melee DEF":[a["defM"] for a in loomiansDados],
-        "Ranged ATK":[a["atkR"] for a in loomiansDados],
-        "Ranged DEF":[a["defR"] for a in loomiansDados],
-        "Speed":[a["speed"] for a in loomiansDados]})
-
 def loadPaste():
     """Cria a pasta data caso ela não exista, se o icone não existir também o baixará"""
     endereco = str(os.getcwd())+"\data"
@@ -103,61 +32,6 @@ def loadPaste():
     if not "loomyPadIcon.ico" in os.listdir(endereco):
         baixarIcone("https://filedropper.com/d/s/download/txeX2OtA6v6bLkCCnkgFF5JSbfAB6I", endereco)
 
-def tp_otherStats(base, up, lvl, prsnlt, final):
-    """Calcula os Tps, como: Melee ATK, Melee DEF, Ranged ATK, Ranged DEF, Speed.
-    retorna 0 se o resultado não for maior que 0, e 200 se o resultado for maio ou igual 200
-    fora essas exeções ele retorna o resultado arredondado
-    
-    parametros:
-        int - base/up/lvl/prsnlt/final: dados do loomian que precisam ser recebidos para efetuar o calculo"""
-        
-    resultado = ((((final*10)*100)-((((((2*base+up)*4)*lvl)/4)+500)*prsnlt))*4)/(lvl*prsnlt)
-    
-    if resultado >= 0:
-        if resultado >=200:
-            return 200
-        else:
-            return round(resultado)
-    else:
-        return 0
-def tp_energy(base, up, lvl, prsnlt, final):
-    """
-    Calcula os Tps de energy.
-    
-    retorna 0 se o resultado não for maior que 0, e 200 se o resultado for maio ou igual 200
-    fora essas exeções ele retorna o resultado arredondado
-    
-    parametros:
-        int - base/up/lvl/prsnlt/final: dados do loomian que precisam ser recebidos para efetuar o calculo
-    """
-    
-    resultado = ((((final*prsnlt)*65)-((((((2*base+up)*4)*lvl)/4)+80*65)*prsnlt))*4)/(lvl*prsnlt)
-    
-    if resultado >= 0:
-        if resultado >=200:
-            return 200
-        else:
-            return round(resultado)
-    else:
-        return 0
-def tp_health(base, up, lvl, final):
-    """
-    Calcula os Tps de health.
-    
-    retorna 0 se o resultado não for maior que 0, e 200 se o resultado for maio ou igual 200
-    fora essas exeções ele retorna o resultado arredondado
-    
-    parametros:
-        int - base/up/lvl/final: dados do loomian que precisam ser recebidos para efetuar o calculo"""
-    
-    resultado = (((final*100)-(((((2*base+up)*4)*lvl)/4)+((lvl+10)*100)))*4)/lvl
-    if resultado >= 0:
-        if resultado >=200:
-            return 200
-        else:
-            return round(resultado)
-    else:
-        return 0
 
 def getVariables():
     """Define os valores das variaveis e retorna se a ação foi concluida com sucesso
