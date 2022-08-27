@@ -202,10 +202,10 @@ loomians = {nome:posicao for posicao, nome in enumerate(df["Loomian"])}
 listaLoomians = [a for a in df["Loomian"]]
 up = [
     {"simbolo":"⋆", "valor":"0", "valores":[0]}, 
-    {"simbolo":"☆", "valor":"1-10", "valores":[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}, 
-    {"simbolo":"☆☆", "valor":"11-20", "valores":[11, 12, 13, 14, 15, 16, 17, 18, 19, 20]},
-    {"simbolo":"☆☆☆", "valor":"21-30", "valores":[21, 22, 23, 24, 25, 26, 27, 28, 29, 30]},
-    {"simbolo":"☆☆☆☆", "valor":"31-38", "valores":[31, 32, 33, 34, 35, 36, 37, 37, 38]},
+    {"simbolo":"☆", "valor":"1-10", "valores":[1, 10]}, 
+    {"simbolo":"☆☆", "valor":"11-20", "valores":[11, 20]},
+    {"simbolo":"☆☆☆", "valor":"21-30", "valores":[21, 30]},
+    {"simbolo":"☆☆☆☆", "valor":"31-38", "valores":[31, 38]},
     {"simbolo":"☆☆☆☆☆", "valor":"39", "valores":[39]},
     {"simbolo":"★★★★★", "valor":"40", "valores":[40]}]
 personalities = [
@@ -336,14 +336,15 @@ def tela():
                     resultsTps = ""
                     if formula == "otherStats":
                         for pup in up[stars].get("valores"):
-                            resultsTps+= str(tp_otherStats(stats["base"], pup, stats["lvl"], stats["prsnlt"], stats["final"])) + "/"
+                            resultsTps+= str(tp_otherStats(stats["base"], pup, stats["lvl"], stats["prsnlt"], stats["final"])) + " - "
                     elif formula == "health":
                         for pup in up[stars].get("valores"):
-                            resultsTps+= str(tp_health(stats["base"], pup, stats["lvl"], stats["final"])) + "/"
+                            resultsTps+= str(tp_health(stats["base"], pup, stats["lvl"], stats["final"])) + " - "
                     else:
                         for pup in up[stars].get("valores"):
-                            resultsTps+= str(tp_energy(stats["base"], pup, stats["lvl"], stats["prsnlt"], stats["final"])) + "/"
-                    janela["text_tp"].update(resultsTps)
+                            resultsTps+= str(tp_energy(stats["base"], pup, stats["lvl"], stats["prsnlt"], stats["final"])) + " - "
+                    
+                    janela["text_tp"].update(resultsTps.strip()[:len(resultsTps)-2])
             elif evento == "radio_otherStats" or evento == "radio_energy" or evento == "radio_health":
                 """Define o valor da variavel formula de acordo com o evento"""
                 formula = {"radio_otherStats":"otherStats", "radio_energy":"energy", "radio_health":"health"}[evento]
