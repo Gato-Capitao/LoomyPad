@@ -350,21 +350,25 @@ def tela():
                 formula = {"radio_otherStats":"otherStats", "radio_energy":"energy", "radio_health":"health"}[evento]
         
         elif janela == jGetBase:
-            if evento == "gbutton_carregar" and valor["gcombo"] in listaLoomians:
+            
+            if evento == "gbutton_carregar" and valor["gcombo"].capitalize() in listaLoomians:
                 """
                 Define os valores base e os mostra na tela, atualizando os valores na janela
                 
                 Variaveis:
                     dict - baseStats: Carrega os valores base, que se liga com o botão
                 """
+                
+                loomianId = loomians[str(valor["gcombo"]).capitalize()]
+                
                 baseStats = {
-                "button_health":str(df["Health"].get(loomians[valor["gcombo"]])), 
-                "button_energy":str(df["Energy"].get(loomians[valor["gcombo"]])),
-                "button_matk":str(df["Melee ATK"].get(loomians[valor["gcombo"]])),
-                "button_mdef":str(df["Melee DEF"].get(loomians[valor["gcombo"]])),
-                "button_ratk":str(df["Ranged ATK"].get(loomians[valor["gcombo"]])),
-                "button_rdef":str(df["Ranged DEF"].get(loomians[valor["gcombo"]])),
-                "button_speed":str(df["Speed"].get(loomians[valor["gcombo"]]))}
+                "button_health":str(df["Health"].get(loomianId)), 
+                "button_energy":str(df["Energy"].get(loomianId)),
+                "button_matk":str(df["Melee ATK"].get(loomianId)),
+                "button_mdef":str(df["Melee DEF"].get(loomianId)),
+                "button_ratk":str(df["Ranged ATK"].get(loomianId)),
+                "button_rdef":str(df["Ranged DEF"].get(loomianId)),
+                "button_speed":str(df["Speed"].get(loomianId))}
                 janela["text_health"].update(str(baseStats["button_health"]))
                 janela["text_energy"].update(str(baseStats["button_energy"]))
                 janela["text_matk"].update(str(baseStats["button_matk"]))
